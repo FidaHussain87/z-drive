@@ -5,19 +5,24 @@ import {
   SignOutButton,
   SignedIn,
   SignedOut,
+  useOrganization,
 } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
-import Image from "next/image";
 import { api } from "../../convex/_generated/api";
-import { useEffect, useState } from "react";
 
 export default function Home() {
+  const { organization } = useOrganization();
   const createFile = useMutation(api.storefiles.createFile);
-  const files = useQuery(api.storefiles.getFiles);
+  const files = useQuery(
+    api.storefiles.getFiles,
+    organization?.id ? { orgId: organization.id } : "skip"
+  );
 
   const handleFileStore = () => {
+    if (!organization) return;
     createFile({
       name: "Hello World3",
+      orgId: organization?.id,
     });
   };
 
